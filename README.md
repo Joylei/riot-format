@@ -12,7 +12,7 @@ require('riot-format')(riot);
 define a tag
 ```html
 <app>
-  <p>{format(new Date(), 'date', 'yyyy-MM-dd')}</p>
+  <p>{format(new Date(), 'date', 'yyyy-mm-dd')}</p>
 </app>
 ```
 ## extend
@@ -22,8 +22,10 @@ let Formatter = require('riot-format').Formatter;
 Formatter.prototype.yesno = function(){
   if(!!this.value){
     this.value = 'yes';
+    return this;
   }
   this.value = 'no';
+  return this;
 };
 ```
 let's use this method
@@ -40,15 +42,18 @@ define another method
 let Formatter = require('riot-format').Formatter;
 Formatter.prototype.isToday = function(){
   if(this.value){
-    let date = (this.value instanceof Date ? this.value : new Date(this.value);
+    var date = (this.value instanceof Date) ? this.value : new Date(this.value);
     if(!isNaN(date)){
-      if(date.format('yyyyMMdd') == new Date().format('yyyyMMdd')){
-        this.value = true
+      var now = new Date();
+      if((''+date.getYear()+date.getMonth()+date.getDate()) === (''+now.getYear()+now.getMonth()+now.getDate())){
+        this.value = true;
+        return this;
       }
     }
   }
 
   this.value = false;
+  return this;
 };
 ```
 use it
