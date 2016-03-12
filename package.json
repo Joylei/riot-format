@@ -1,8 +1,8 @@
 {
   "name": "riot-format",
-  "version": "0.1.1",
+  "version": "0.1.3",
   "description": "a helper library for riotjs to format displays",
-  "main": "index.js",
+  "main": "dist/riot-format.js",
   "scripts": {
     "start": "npm run build && npm run build:example && open examples/index.html",
     "build": "node node_modules/.bin/babel src -o dist/riot-format.js -s --presets es2015 --plugins transform-es2015-modules-umd",
