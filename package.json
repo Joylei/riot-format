@@ -1,6 +1,6 @@
 {
   "name": "riot-format",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "a helper library for riotjs to format displays",
   "main": "index.js",
   "scripts": {
