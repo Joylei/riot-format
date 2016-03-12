@@ -3,32 +3,23 @@ define(function(require, exports, module) {
   var format = require('riot-format');
   format(riot);
 
-  var Formatter = format.Formatter;
-
-  Formatter.prototype.isToday = function(){
-    if(this.value){
-      var date = (this.value instanceof Date) ? this.value : new Date(this.value);
-      if(!isNaN(date)){
+  format.define('isToday', function(value) {
+    if (value) {
+      var date = (value instanceof Date) ? value : new Date(value);
+      if (!isNaN(date)) {
         var now = new Date();
-        if((''+date.getYear()+date.getMonth()+date.getDate()) === (''+now.getYear()+now.getMonth()+now.getDate())){
-          this.value = true;
-          return this;
+        if (('' + date.getYear() + date.getMonth() + date.getDate()) === ('' + now.getYear() + now.getMonth() + now.getDate())) {
+          return true;
         }
       }
     }
+    return false;
+  });
 
-    this.value = false;
-    return this;
-  };
 
-  Formatter.prototype.yesno = function(){
-    if(!!this.value){
-      this.value = 'yes';
-      return this;
-    }
-    this.value = 'no';
-    return this;
-  };
+  format.define('yesno', function(value) {
+    return !!value ? 'yes' : 'no';
+  });
 
   require('./tags/app.js');
   riot.mount('app');

@@ -2,7 +2,7 @@
   <p>today is {format(now, 'date', 'yyyy-mm-dd HH:MM:ss')}</p>
   <p>should display yes: {format(1, 'yesno')}</p>
   <p>should display no: {format(null, 'yesno')}</p>
-  <p>should display true: {format(new Date(), 'date').isToday()}</p>
+  <p>should display true: {format(new Date().toString()).date().isToday()}</p>
 
   <script>
   var self = this;

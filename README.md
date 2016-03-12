@@ -2,6 +2,11 @@
 a helper library for riotjs to format displays
 
 # usage
+
+currently there is only one pre-defined formatter: date().
+
+anyway, you can define more formatters as you need.
+
 ## basic
 import riot-format
 ```js
@@ -18,48 +23,42 @@ define a tag
 ## extend
 define your own format method
 ```js
-let Formatter = require('riot-format').Formatter;
-Formatter.prototype.yesno = function(){
-  if(!!this.value){
-    this.value = 'yes';
-    return this;
-  }
-  this.value = 'no';
-  return this;
-};
+let format = require('riot-format');
+format.define('yesno', function(value) {
+  return !!value ? 'yes' : 'no';
+});
 ```
 let's use this method
 ```html
 <app>
   <p>should display yes: {format(1, 'yesno')}</p>
   <p>should display no: {format(null, 'yesno')}</p>
+  <p>or use like this: {format(1).yesno()}</p>
 </app>
 ```
+Note: it should be easy to understand how it works if you are familiar with pipes.
 
-## chained call
+## pipes
 define another method
 ```js
-let Formatter = require('riot-format').Formatter;
-Formatter.prototype.isToday = function(){
-  if(this.value){
-    var date = (this.value instanceof Date) ? this.value : new Date(this.value);
-    if(!isNaN(date)){
+let format = require('riot-format');
+format.define('isToday', function(value) {
+  if (value) {
+    var date = (value instanceof Date) ? value : new Date(value);
+    if (!isNaN(date)) {
       var now = new Date();
-      if((''+date.getYear()+date.getMonth()+date.getDate()) === (''+now.getYear()+now.getMonth()+now.getDate())){
-        this.value = true;
-        return this;
+      if (('' + date.getYear() + date.getMonth() + date.getDate()) === ('' + now.getYear() + now.getMonth() + now.getDate())) {
+        return true;
       }
     }
   }
-
-  this.value = false;
-  return this;
-};
+  return false;
+});
 ```
 use it
 ```html
 <app>
-  <p>should display true: {format(new Date(), 'date').isToday()}</p>
+  <p>should display true: {format(new Date().toString()).date().isToday()}</p>
 </app>
 ```
 
