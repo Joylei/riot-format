@@ -21,10 +21,11 @@
     <script>
     var require = {
       paths:{
-        'riot-format': '../dist/riot-format',
+        'riot-format': './index',
         'riot': 'https://cdn.jsdelivr.net/riot/2.3/riot+compiler.min'
       },
-      deps:['riot', './app'],
+      baseUrl: '../dist/',
+      deps:['riot', '../examples/app'],
     };
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.22/require.js" data-main=""></script>

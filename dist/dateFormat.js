@@ -1,43 +1,21 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(["module"], factory);
+    define(["exports"], factory);
   } else if (typeof exports !== "undefined") {
-    factory(module);
+    factory(exports);
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod);
-    global.index = mod.exports;
+    factory(mod.exports);
+    global.dateFormat = mod.exports;
   }
-})(this, function (module) {
+})(this, function (exports) {
   "use strict";
 
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  }
-
-  var _createClass = function () {
-    function defineProperties(target, props) {
-      for (var i = 0; i < props.length; i++) {
-        var descriptor = props[i];
-        descriptor.enumerable = descriptor.enumerable || false;
-        descriptor.configurable = true;
-        if ("value" in descriptor) descriptor.writable = true;
-        Object.defineProperty(target, descriptor.key, descriptor);
-      }
-    }
-
-    return function (Constructor, protoProps, staticProps) {
-      if (protoProps) defineProperties(Constructor.prototype, protoProps);
-      if (staticProps) defineProperties(Constructor, staticProps);
-      return Constructor;
-    };
-  }();
-
-  var slice = Array.prototype.slice;
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
 
   //taken from http://stevenlevithan.com/assets/misc/date.format.js
   /*
@@ -156,92 +134,12 @@
     monthNames: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
   };
 
-  // // For convenience...
-  //
-  // Date.prototype.format = function (mask, utc) {
-  // 	return dateFormat(this, mask, utc);
-  // };
-
-  var Formatter = function () {
-    function Formatter(value) {
-      _classCallCheck(this, Formatter);
-
-      this.value = value;
-    }
-
-    _createClass(Formatter, [{
-      key: "date",
-      value: function date(pattern) {
-        var value = this.value;
-        try {
-          this.value = dateFormat(value, pattern);
-        } catch (e) {
-          console.log(e);
-          this.value = null;
-        }
-        return this;
-      }
-    }, {
-      key: "toString",
-      value: function toString() {
-        //apply auto format
-        if (this.value instanceof Date && !isNaN(this.value.valueOf())) {
-          return this.date('mm/dd/yyyy').toString();
-        }
-        return String(this.value);
-      }
-    }, {
-      key: "valueOf",
-      value: function valueOf() {
-        return this.value;
-      }
-    }]);
-
-    return Formatter;
-  }();
-
-  /**
-  * format a given value in the riot tag context
-  * usage:
-  *   create a riot tag
-  * <pre>
-  *   <app>
-        <p> {format(new Date(), 'date', 'yyyy-mm-dd HH:MM:ss')} </p>
-  *   </app>
-  * </pre>
-  * @param {any} value      the value passed in to be formatted
-  * @param {string} method  the format method of Formatter
-  * @return {any} the formatted result
-  */
-  function format(value, method) {
-    var self = new Formatter(value);
-    if (typeof method == 'string' && method != 'toString' && method != 'valueOf') {
-      var fn = self[method];
-      if (typeof fn === 'function') {
-        var args = slice.call(arguments, 2);
-        fn.apply(self, args);
-      }
-    }
-    return self;
-  }
-
-  function hook(riot) {
-    if (!riot.Tag.prototype.format) {
-      riot.Tag.prototype.format = format;
-    }
-  }
-
-  hook.define = function (name, fn) {
-    if (typeof name == 'string' && typeof fn == 'function') {
-      Formatter.prototype[name] = function () {
-        var args = [this.valueOf()].concat(arguments);
-        this.value = fn.apply(null, args);
-        return this;
-      };
-    }
+  dateFormat.polyfill = function () {
+    // For convenience...
+    Date.prototype.format = function (mask, utc) {
+      return dateFormat(this, mask, utc);
+    };
   };
-
-  module.exports = hook;
+  exports.default = dateFormat;
 });
-
-//# sourceMappingURL=riot-format.js.map
+//# sourceMappingURL=dateFormat.js.map
