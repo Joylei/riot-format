@@ -18,16 +18,15 @@
     <h1>riot-format examples</h1>
     <p>Please look at the source code for usages<p>
     <app></app>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/riot/3.0.1/riot.min.js"></script>
     <script>
-    var require = {
-      paths:{
-        'riot-format': './index',
-        'riot': 'https://cdn.jsdelivr.net/riot/2.3/riot+compiler.min'
-      },
-      baseUrl: '../dist/',
-      deps:['riot', '../examples/app'],
-    };
+      //fake require here, you should use requirejs or something else
+      window.require = function(moduleName){
+        if(moduleName === 'riot'){
+          return window.riot;
+        }
+      };
     </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.22/require.js" data-main=""></script>
+    <script src="bundle.js"></script>
   </body>
 </html>

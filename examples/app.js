@@ -1,26 +1,8 @@
-define(function(require, exports, module) {
-  var riot = require('riot');
-  var format = require('riot-format');
-  format(riot);
+import riot from 'riot';
 
-  format.define('isToday', function(value) {
-    if (value) {
-      var date = (value instanceof Date) ? value : new Date(value);
-      if (!isNaN(date)) {
-        var now = new Date();
-        if (('' + date.getYear() + date.getMonth() + date.getDate()) === ('' + now.getYear() + now.getMonth() + now.getDate())) {
-          return true;
-        }
-      }
-    }
-    return false;
-  });
+//has to do it this way, because import behavior
+//and we want it takes effect before we import any tags
+import './format';
+import './tags/app.html';
 
-
-  format.define('yesno', function(value) {
-    return !!value ? 'yes' : 'no';
-  });
-
-  require('./tags/app.js');
-  riot.mount('app');
-});
+riot.mount('app');

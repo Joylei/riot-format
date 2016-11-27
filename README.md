@@ -59,28 +59,54 @@ if not a number or number below 0, display the default value.
 
 eg: -1 as --, 5 as 5, 2345 as 2.29K
 
+## json()
+convert input to JSON string
+
 # usage
+
+## use format as global method, so that you can use it with riot or without riot.
+```js
+import { format } from 'riot-format';
+//make it global;
+window.format = format;
+
+console.log(format(new Date()));
+```
+
+in this way, riot tag should work
+```
+<app>
+{ format(new Date()) }
+</app>
+```
+
+## use it as riot mixin
+
+### mixin globally
+```
+import format from 'riot-format';
+import * as riot from 'riot';
+format(riot);//mixin it globally
+```
+
+### you can also mixin it by your need
+```js
+//your tag
+import { format } from 'riot-format';
+<app>
+  <span>{ format(new Date()) }</span>
+  riot.mixin({ format });
+</app>
+```
+
 
 Besides these  methods, you can define more formatters as you need.
 
-## basic
-import riot-format
-```js
-let riot = require('riot');
-require('riot-format')(riot);
-```
-
-define a tag
-```html
-<app>
-  <p>{format(new Date(), 'date', 'yyyy-mm-dd')}</p>
-</app>
-```
 ## extend
 define your own format method
 ```js
-let format = require('riot-format');
-format.define('yesno', function(value) {
+import { define } from 'riot-format';
+define('yesno', function(value) {
   return !!value ? 'yes' : 'no';
 });
 ```
@@ -97,8 +123,8 @@ Note: it should be easy to understand how it works if you are familiar with pipe
 ## pipes
 define another method
 ```js
-let format = require('riot-format');
-format.define('isToday', function(value) {
+import { define } from 'riot-format';
+define('isToday', function(value) {
   if (value) {
     var date = (value instanceof Date) ? value : new Date(value);
     if (!isNaN(date)) {
