@@ -11,6 +11,7 @@ All parameters are optional.
 convert input to date and format by specified mask
 
 Pre-defined format masks:
+
 - default: "ddd mmm dd yyyy HH:MM:ss",
 - shortDate: "m/d/yy",
 - mediumDate: "mmm d, yyyy",
@@ -25,6 +26,7 @@ Pre-defined format masks:
 - isoUtcDateTime: "UTC:yyyy-mm-dd'T'HH:MM:ss'Z'"
 
 mask supported flags:
+
 - d : day number of a month without padding 0 on the left
 - dd : day number of a month with padding 0 on the left
 - ddd : short day name of a week
@@ -58,7 +60,7 @@ if it's a infinite number, it will be displayed as '-∞' or '∞'
 
 ### bytes(fractionSize?: Number = 2, defaultValue?:string = '--')
 
-format number in K( > 1024), M (> 1024 * 1024), G (> 1024 * 1024 * 1024).
+format number in K( > 1024), M( > 1024*1024), G( > 1024*1024*1024).
 if not a number or number below 0, display the default value.
 
 eg: -1 as --, 5 as 5, 2345 as 2.29K
@@ -69,7 +71,7 @@ convert input to JSON string
 
 ## usage
 
-### use format as global method, so that you can use it with riot or without riot.
+### use format as global method, so that you can use it with riot or without riot
 
 ```js
 import { format } from 'riot-format';
@@ -79,11 +81,12 @@ window.format = format;
 console.log(format(new Date()));
 ```
 
-```
+```html
 <app>
 { format(new Date()) }
 </app>
 ```
+
 Note: this way the format method is available for all tags.
 
 ## use it as riot mixin
@@ -114,6 +117,7 @@ riot.mixin('riot-format', {
   this.mixin('riot-format');
 </app>
 ```
+
 Note: in this case the format method is available in the tag you defined.
 
 ### no mixin, use it directly

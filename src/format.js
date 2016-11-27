@@ -22,16 +22,16 @@ const ForbiddenMethods = ['value', 'toString', 'valueOf']
 * @returns {Formatter} the Formatter instance
 */
 export function format (value, method, ...args) {
-  const self = new Formatter(value)
-  if (typeof method == 'string' && ForbiddenMethods.indexOf(method)==-1) {
-    const fn = self[method]
-    if (typeof fn === 'function') {
-      fn.apply(self, args)
-    }else if(!fn){
-        throw new Error('method not found: ' + method);
+    const self = new Formatter(value)
+    if (typeof method == 'string' && ForbiddenMethods.indexOf(method)==-1) {
+        const fn = self[method]
+        if (typeof fn === 'function') {
+            fn.apply(self, args)
+        }else if(!fn){
+            throw new Error('method not found: ' + method)
+        }
     }
-  }
-  return self
+    return self
 }
 
 /**
@@ -39,12 +39,12 @@ export function format (value, method, ...args) {
  * @param {Function} fn method body
  */
 function defineFormatter (method, fn) {
-  if (typeof method == 'string' && ForbiddenMethods.indexOf(method)==-1 && typeof fn == 'function') {
-    Formatter.prototype[method] = function (...args) {
-      this.value = fn.apply(null, [this.valueOf()].concat(args))
-      return this
+    if (typeof method == 'string' && ForbiddenMethods.indexOf(method)==-1 && typeof fn == 'function') {
+        Formatter.prototype[method] = function (...args) {
+            this.value = fn.apply(null, [this.valueOf()].concat(args))
+            return this
+        }
     }
-  }
 }
 
 /**
@@ -68,12 +68,12 @@ function defineFormatter (method, fn) {
  * @param {Function} fn should be used if name is String
  */
 export function extend (name, fn) {
-  if (typeof name === 'object') {
-    const obj = name
-    for (let key in obj) {
-      defineFormatter(key, obj[key])
+    if (typeof name === 'object') {
+        const obj = name
+        for (let key in obj) {
+            defineFormatter(key, obj[key])
+        }
+    }else {
+        defineFormatter(name , fn)
     }
-  }else {
-    defineFormatter(name , fn)
-  }
 }

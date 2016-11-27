@@ -9,30 +9,31 @@
  * @class
  */
 var Formatter = function Formatter (value) {
-  this.value = value;
-};
+      this.value = value;
+  };
 
 /**
  * @description format the value to String
  * @returns {String}
  */
-Formatter.prototype.toString = function toString () {
+  Formatter.prototype.toString = function toString () {
   // apply auto format
-  if (this.value instanceof Date && !isNaN(this.value.valueOf())) {
-    var date = this.date;
-    if(typeof date === 'function'){
-      return date.call(this, 'default').toString();
-    }
-  }
-  return String(this.value)
-};
+      if (this.value instanceof Date && !isNaN(this.value.valueOf())) {
+          //test date format method
+          var date = this.date;
+          if(typeof date === 'function'){
+              return date.call(this, 'default').toString()
+          }
+      }
+      return String(this.value)
+  };
 
 /**
  * get current value
  */
-Formatter.prototype.valueOf = function valueOf () {
-  return this.value
-};
+  Formatter.prototype.valueOf = function valueOf () {
+      return this.value
+  };
 
 /**
  * Forbidden names when define formatters or retrieve formatter
@@ -56,19 +57,19 @@ var ForbiddenMethods = ['value', 'toString', 'valueOf'];
 * @returns {Formatter} the Formatter instance
 */
 function format (value, method) {
-  var args = [], len = arguments.length - 2;
-  while ( len-- > 0 ) args[ len ] = arguments[ len + 2 ];
+    var args = [], len = arguments.length - 2;
+    while ( len-- > 0 ) args[ len ] = arguments[ len + 2 ];
 
-  var self = new Formatter(value);
-  if (typeof method == 'string' && ForbiddenMethods.indexOf(method)==-1) {
-    var fn = self[method];
-    if (typeof fn === 'function') {
-      fn.apply(self, args);
-    }else if(!fn){
-        throw new Error('method not found: ' + method);
+    var self = new Formatter(value);
+    if (typeof method == 'string' && ForbiddenMethods.indexOf(method)==-1) {
+        var fn = self[method];
+        if (typeof fn === 'function') {
+            fn.apply(self, args);
+        }else if(!fn){
+            throw new Error('method not found: ' + method)
+        }
     }
-  }
-  return self
+    return self
 }
 
 /**
@@ -76,15 +77,15 @@ function format (value, method) {
  * @param {Function} fn method body
  */
 function defineFormatter (method, fn) {
-  if (typeof method == 'string' && ForbiddenMethods.indexOf(method)==-1 && typeof fn == 'function') {
-    Formatter.prototype[method] = function () {
-      var args = [], len = arguments.length;
-      while ( len-- ) args[ len ] = arguments[ len ];
+    if (typeof method == 'string' && ForbiddenMethods.indexOf(method)==-1 && typeof fn == 'function') {
+        Formatter.prototype[method] = function () {
+            var args = [], len = arguments.length;
+            while ( len-- ) args[ len ] = arguments[ len ];
 
-      this.value = fn.apply(null, [this.valueOf()].concat(args));
-      return this
-    };
-  }
+            this.value = fn.apply(null, [this.valueOf()].concat(args));
+            return this
+        };
+    }
 }
 
 /**
@@ -108,14 +109,14 @@ function defineFormatter (method, fn) {
  * @param {Function} fn should be used if name is String
  */
 function extend (name, fn) {
-  if (typeof name === 'object') {
-    var obj = name;
-    for (var key in obj) {
-      defineFormatter(key, obj[key]);
+    if (typeof name === 'object') {
+        var obj = name;
+        for (var key in obj) {
+            defineFormatter(key, obj[key]);
+        }
+    }else {
+        defineFormatter(name , fn);
     }
-  }else {
-    defineFormatter(name , fn);
-  }
 }
 
 // taken from http://stevenlevithan.com/assets/misc/date.format.js
@@ -134,165 +135,167 @@ function extend (name, fn) {
  */
 
 var dateFormat = function () {
-  var token = /d{1,4}|m{1,4}|yy(?:yy)?|([HhMsTt])\1?|[LloSZ]|"[^"]*"|'[^']*'/g,
-    timezone = /\b(?:[PMCEA][SDP]T|(?:Pacific|Mountain|Central|Eastern|Atlantic) (?:Standard|Daylight|Prevailing) Time|(?:GMT|UTC)(?:[-+]\d{4})?)\b/g,
-    timezoneClip = /[^-+\dA-Z]/g,
-    pad = function (val, len) {
-      val = String(val);
-      len = len || 2;
-      while (val.length < len) { val = '0' + val; }
-      return val
-  };
+    var token = /d{1,4}|m{1,4}|yy(?:yy)?|([HhMsTt])\1?|[LloSZ]|"[^"]*"|'[^']*'/g,
+        timezone = /\b(?:[PMCEA][SDP]T|(?:Pacific|Mountain|Central|Eastern|Atlantic) (?:Standard|Daylight|Prevailing) Time|(?:GMT|UTC)(?:[-+]\d{4})?)\b/g,
+        timezoneClip = /[^-+\dA-Z]/g,
+        pad = function (val, len) {
+            val = String(val);
+            len = len || 2;
+            while (val.length < len) { val = '0' + val; }
+            return val
+        };
 
   // Regexes and supporting functions are cached through closure
-  return function (date, mask, utc) {
-    var dF = dateFormat;
+    return function (date, mask, utc) {
+        var dF = dateFormat;
 
     // You can't provide utc if you skip other args (use the "UTC:" mask prefix)
-    if (arguments.length == 1 && Object.prototype.toString.call(date) == '[object String]' && !/\d/.test(date)) {
-      mask = date;
-      date = undefined;
-    }
+        if (arguments.length == 1 && Object.prototype.toString.call(date) == '[object String]' && !/\d/.test(date)) {
+            mask = date;
+            date = undefined;
+        }
 
     // Passing date through Date applies Date.parse, if necessary
-    date = date ? new Date(date) : new Date;
-    if (isNaN(date)) { throw SyntaxError('invalid date') }
+        date = date ? new Date(date) : new Date();
+        if (isNaN(date)) { throw SyntaxError('invalid date') }
 
-    mask = String(dF.masks[mask] || mask || dF.masks['default']);
+        mask = String(dF.masks[mask] || mask || dF.masks['default']);
 
     // Allow setting the utc argument via the mask
-    if (mask.slice(0, 4) == 'UTC:') {
-      mask = mask.slice(4);
-      utc = true;
+        if (mask.slice(0, 4) == 'UTC:') {
+            mask = mask.slice(4);
+            utc = true;
+        }
+
+        var _ = utc ? 'getUTC' : 'get',
+            d = date[_ + 'Date'](),
+            D = date[_ + 'Day'](),
+            m = date[_ + 'Month'](),
+            y = date[_ + 'FullYear'](),
+            H = date[_ + 'Hours'](),
+            M = date[_ + 'Minutes'](),
+            s = date[_ + 'Seconds'](),
+            L = date[_ + 'Milliseconds'](),
+            o = utc ? 0 : date.getTimezoneOffset(),
+            flags = {
+                d: d,
+                dd: pad(d),
+                ddd: dF.i18n.dayNames[D],
+                dddd: dF.i18n.dayNames[D + 7],
+                m: m + 1,
+                mm: pad(m + 1),
+                mmm: dF.i18n.monthNames[m],
+                mmmm: dF.i18n.monthNames[m + 12],
+                yy: String(y).slice(2),
+                yyyy: y,
+                h: H % 12 || 12,
+                hh: pad(H % 12 || 12),
+                H: H,
+                HH: pad(H),
+                M: M,
+                MM: pad(M),
+                s: s,
+                ss: pad(s),
+                l: pad(L, 3),
+                L: pad(L > 99 ? Math.round(L / 10) : L),
+                t: H < 12 ? 'a' : 'p',
+                tt: H < 12 ? 'am' : 'pm',
+                T: H < 12 ? 'A' : 'P',
+                TT: H < 12 ? 'AM' : 'PM',
+                Z: utc ? 'UTC' : (String(date).match(timezone) || ['']).pop().replace(timezoneClip, ''),
+                o: (o > 0 ? '-' : '+') + pad(Math.floor(Math.abs(o) / 60) * 100 + Math.abs(o) % 60, 4),
+                S: ['th', 'st', 'nd', 'rd'][d % 10 > 3 ? 0 : (d % 100 - d % 10 != 10) * d % 10]
+            };
+
+        return mask.replace(token, function ($0) {
+            return $0 in flags ? flags[$0] : $0.slice(1, $0.length - 1)
+        })
     }
-
-    var _ = utc ? 'getUTC' : 'get',
-      d = date[_ + 'Date'](),
-      D = date[_ + 'Day'](),
-      m = date[_ + 'Month'](),
-      y = date[_ + 'FullYear'](),
-      H = date[_ + 'Hours'](),
-      M = date[_ + 'Minutes'](),
-      s = date[_ + 'Seconds'](),
-      L = date[_ + 'Milliseconds'](),
-      o = utc ? 0 : date.getTimezoneOffset(),
-      flags = {
-        d: d,
-        dd: pad(d),
-        ddd: dF.i18n.dayNames[D],
-        dddd: dF.i18n.dayNames[D + 7],
-        m: m + 1,
-        mm: pad(m + 1),
-        mmm: dF.i18n.monthNames[m],
-        mmmm: dF.i18n.monthNames[m + 12],
-        yy: String(y).slice(2),
-        yyyy: y,
-        h: H % 12 || 12,
-        hh: pad(H % 12 || 12),
-        H: H,
-        HH: pad(H),
-        M: M,
-        MM: pad(M),
-        s: s,
-        ss: pad(s),
-        l: pad(L, 3),
-        L: pad(L > 99 ? Math.round(L / 10) : L),
-        t: H < 12 ? 'a' : 'p',
-        tt: H < 12 ? 'am' : 'pm',
-        T: H < 12 ? 'A' : 'P',
-        TT: H < 12 ? 'AM' : 'PM',
-        Z: utc ? 'UTC' : (String(date).match(timezone) || ['']).pop().replace(timezoneClip, ''),
-        o: (o > 0 ? '-' : '+') + pad(Math.floor(Math.abs(o) / 60) * 100 + Math.abs(o) % 60, 4),
-        S: ['th', 'st', 'nd', 'rd'][d % 10 > 3 ? 0 : (d % 100 - d % 10 != 10) * d % 10]
-    };
-
-    return mask.replace(token, function ($0) {
-      return $0 in flags ? flags[$0] : $0.slice(1, $0.length - 1)
-    })
-  }
 }();
 
 // Some common format strings
 dateFormat.masks = {
-  'default': 'ddd mmm dd yyyy HH:MM:ss',
-  shortDate: 'm/d/yy',
-  mediumDate: 'mmm d, yyyy',
-  longDate: 'mmmm d, yyyy',
-  fullDate: 'dddd, mmmm d, yyyy',
-  shortTime: 'h:MM TT',
-  mediumTime: 'h:MM:ss TT',
-  longTime: 'h:MM:ss TT Z',
-  isoDate: 'yyyy-mm-dd',
-  isoTime: 'HH:MM:ss',
-  isoDateTime: "yyyy-mm-dd'T'HH:MM:ss",
-  isoUtcDateTime: "UTC:yyyy-mm-dd'T'HH:MM:ss'Z'"
+    'default': 'ddd mmm dd yyyy HH:MM:ss',
+    shortDate: 'm/d/yy',
+    mediumDate: 'mmm d, yyyy',
+    longDate: 'mmmm d, yyyy',
+    fullDate: 'dddd, mmmm d, yyyy',
+    shortTime: 'h:MM TT',
+    mediumTime: 'h:MM:ss TT',
+    longTime: 'h:MM:ss TT Z',
+    isoDate: 'yyyy-mm-dd',
+    isoTime: 'HH:MM:ss',
+    isoDateTime: 'yyyy-mm-dd\'T\'HH:MM:ss',
+    isoUtcDateTime: 'UTC:yyyy-mm-dd\'T\'HH:MM:ss\'Z\''
 };
 
 // Internationalization strings
 dateFormat.i18n = {
-  dayNames: [
-    'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat',
-    'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'
-  ],
-  monthNames: [
-    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
-    'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
-  ]
+    dayNames: [
+        'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat',
+        'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'
+    ],
+    monthNames: [
+        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+        'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
+    ]
 };
+
 
 dateFormat.polyfill = function () {
-  // For convenience...
-  Date.prototype.format = function (mask, utc) {
-    return dateFormat(this, mask, utc)
-  };
+    // For convenience...
+    
+    /*jshint -W121 */
+    Date.prototype.format = function (mask, utc) {
+        return dateFormat(this, mask, utc)
+    };
+    /*jshint +W121 */
 };
 
-extend('date', function date (input, pattern) {
-  return dateFormat(input, pattern)
-});
+function number (input, fractionSize) {
+    if (fractionSize === void 0 || fractionSize < 0) {
+        fractionSize = 2;
+    }
+    var num = Number(input);
+    if (isNaN(num.valueOf())) {
+        return input
+    }
+    if (!isFinite(num.valueOf())) {
+        return num.valueOf() < 0 ? '-∞' : '∞'
+    }
+    return num.toFixed(fractionSize).replace(/(\d)(?=(\d{3})+\.)/g, '$1,')
+}
 
-extend('number', function number (input, fractionSize) {
-  if (fractionSize === void 0 || fractionSize < 0) {
-    fractionSize = 2;
-  }
-  var num = Number(input);
-  if (isNaN(num.valueOf())) {
-    return input
-  }
-  if (!isFinite(num.valueOf())) {
-    return num.valueOf() < 0 ? '-∞' : '∞'
-  }
-  return num.toFixed(fractionSize).replace(/(\d)(?=(\d{3})+\.)/g, '$1,')
-});
+function bytes (input, fractionSize , defaultValue) {
+    if ( fractionSize === void 0 ) fractionSize = 2;
+    if ( defaultValue === void 0 ) defaultValue = '--';
 
-extend('bytes', function bytes (input, fractionSize , defaultValue) {
-  if ( fractionSize === void 0 ) fractionSize = 2;
-  if ( defaultValue === void 0 ) defaultValue = '--';
+    var num = Number(input);
 
-  var num = new Number(input);
+    if (isNaN(num.valueOf()) || num < 0) {
+        return defaultValue
+    }
+    if (fractionSize < 0) {
+        fractionSize = 2;
+    }
 
-  if (isNaN(num.valueOf()) || num < 0) {
-    return defaultValue
-  }
-  if (fractionSize < 0) {
-    fractionSize = 2;
-  }
+    if (num < 1024) {
+        return num.toFixed(0) + ''
+    }
+    if (num < 1024 * 1024) {
+        return (num / 1024).toFixed(fractionSize) + 'K'
+    }
+    if (num < 1024 * 1024 * 1024) {
+        return (num / (1024 * 1024)).toFixed(fractionSize) + 'M'
+    }
+    return (num / (1024 * 1024 * 1024)).toFixed(fractionSize) + 'G'
+}
 
-  if (num < 1024) {
-    return num.toFixed(0) + ''
-  }
-  if (num < 1024 * 1024) {
-    return (num / 1024).toFixed(fractionSize) + 'K'
-  }
-  if (num < 1024 * 1024 * 1024) {
-    return (num / (1024 * 1024)).toFixed(fractionSize) + 'M'
-  }
-  return (num / (1024 * 1024 * 1024)).toFixed(fractionSize) + 'G'
-});
+function json (input) {
+    return JSON.stringify(input)
+}
 
-extend('json', function json (input) {
-  return JSON.stringify(input)
-});
+extend({date: dateFormat, number: number,bytes: bytes,json: json});
 
 // import built-in formatters
 /**
@@ -303,7 +306,7 @@ extend('json', function json (input) {
  * use(riot);
  */
 function use(riot) {
-  riot.mixin({format: format});
+    riot.mixin({format: format});
 }
 
 /**
@@ -312,17 +315,18 @@ function use(riot) {
  * @deprecated
  */
 use.define = function () {
-  var args = [], len = arguments.length;
-  while ( len-- ) args[ len ] = arguments[ len ];
+    var args = [], len = arguments.length;
+    while ( len-- ) args[ len ] = arguments[ len ];
 
-  console.warn('define() is deprecated, use extend() instead.');
-  return extend(args)
+    console.warn('define() is deprecated, use extend() instead.');
+    return extend.apply(void 0, args)
 };
 
 use.extend = extend;
 
 use.format = format;
 
+exports.use = use;
 exports['default'] = use;
 exports.format = format;
 exports.extend = extend;

@@ -1,0 +1,43 @@
+{
+    "env": {
+        "browser": false,
+        "es6": false,
+        "node": true
+    },
+    "globals": {
+        "ENV": true,
+        "riot": false,
+        "it" : true,
+        "describe": true,
+        "before": true,
+        "after" : true
+    },
+    "extends": "eslint:recommended",
+    "parserOptions": {
+        "sourceType": "module"
+    },
+    "rules": {
+        "no-undef": 1,
+        "no-unused-vars": 1,
+        "indent": [
+            "error",
+            4
+        ],
+        "no-console": "off",
+        "linebreak-style": [
+            "off",
+            "unix"
+        ],
+        "quotes": [
+            "error",
+            "single"
+        ],
+        "semi": [
+            "error",
+            "never"
+        ]
+    },
+    "plugins": [
+
+    ]
+}

@@ -1,5 +1,3 @@
-import { extend} from '../format'
-
-extend('json', function json (input) {
-  return JSON.stringify(input)
-})
+export default function json (input) {
+    return JSON.stringify(input)
+}

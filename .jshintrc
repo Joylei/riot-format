@@ -1,0 +1,17 @@
+{
+  "freeze": true,
+  "noarg": true,
+  "noempty": true,
+  "quotmark": "single",
+  "unused": true,
+  "eqnull": false,
+  "esversion": 6,
+  "evil": false,
+  "expr": true,
+  "sub": true,
+  "validthis": true,
+  "asi": true,
+
+  "browser": true,
+  "jquery": false
+}

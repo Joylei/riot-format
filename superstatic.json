@@ -1,5 +1,0 @@
-{
-  "redirects": [
-    {"source":"examples/**","destination":"/index.html"}
-  ]
-}

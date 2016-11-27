@@ -10,8 +10,8 @@ import './formatters'
  * import * as riot from 'riot';
  * use(riot);
  */
-export default function use(riot) {
-  riot.mixin({format})
+export function use(riot) {
+    riot.mixin({format})
 }
 
 /**
@@ -20,8 +20,8 @@ export default function use(riot) {
  * @deprecated
  */
 use.define = function (...args) {
-  console.warn('define() is deprecated, use extend() instead.')
-  return extend(args)
+    console.warn('define() is deprecated, use extend() instead.')
+    return extend(...args)
 }
 
 use.extend = extend
@@ -30,3 +30,5 @@ use.format = format
 
 // use.Formatter = Formatter
 export { format, extend } from './format'
+
+export default use

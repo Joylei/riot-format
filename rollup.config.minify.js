@@ -1,6 +1,6 @@
-import uglify from 'rollup-plugin-uglify';
-import resolve from 'rollup-plugin-node-resolve';
-import buble from 'rollup-plugin-buble';
+import uglify from 'rollup-plugin-uglify'
+import resolve from 'rollup-plugin-node-resolve'
+import buble from 'rollup-plugin-buble'
 
 export default {
     entry: 'src/index.js',
@@ -20,4 +20,4 @@ export default {
         }),
         uglify()
     ]
-};
+}
