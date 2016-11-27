@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+  <title>riot-format examples</title>
+  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/riot/3.0.1/riot+compiler.min.js"></script>
+  <script src="riot-format.js"></script>
+  <script src="tags/app.html" type="riot/tag"></script>
+</head>
+
+<body>
+  <h1>riot-format example: custom format methods</h1>
+  <p>Please look at the source code for usages</p>
+  <app></app>
+  <p>
+    <a href="index.html">Back</a>
+  </p>
+  <script>
+      //following lines equals:  import format, { extend } from 'riot-format';
+      var format = riotFormat['default'];
+      var extend = riotFormat.extend;
+
+      format(riot);//mixin
+
+      //extend formatter
+      extend('isToday', function (value) {
+        if (value) {
+          var date = (value instanceof Date) ? value : new Date(value);
+          if (!isNaN(date)) {
+            var now = new Date()
+            if (('' + date.getYear() + date.getMonth() + date.getDate()) === ('' + now.getYear() + now.getMonth() + now.getDate())) {
+              return true;
+            }
+          }
+        }
+        return false;
+      });
+      extend('yesno', function (value) {
+        return !!value ? 'yes' : 'no';
+      });
+
+      //mount riot
+      riot.mount('app');
+    </script>
+</body>
+
+</html>

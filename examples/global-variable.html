@@ -13,17 +13,34 @@
       <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/riot/3.0.1/riot+compiler.min.js"></script>
+  <script src="riot-format.js"></script>
+  <script type="riot/tag">
+    <app>
+      <p>Today is { format(new Date(), 'date', 'yyyy-mm-dd') }</p>
+      <p>10.101 with number format { num }</p>
+
+      this.num =  format(10.101, 'number');
+    </app>
+  </script>
 </head>
 
 <body>
-  <h1>riot-format examples</h1>
+  <h1>riot-format example: global format method</h1>
   <p>Please look at the source code for usages</p>
-  <ul>
-    <li><a href="global-variable.html">use as global varialbe</a> </li>
-    <li><a href="global-mixin.html">use as global mixin</a></li>
-    <li><a href="local-mixin.html">use as local mixin</a></li>
-    <li><a href="custom-methods.html">custom formatters</a></li>
-  </ul>
+  <app></app>
+  <p>
+    <a href="index.html">Back</a>
+  </p>
+  <script>
+      //following lines equals:  import { format } from 'riot-format';
+      var format = riotFormat.format
+
+      window.format = format;
+
+      //mount riot
+      riot.mount('app');
+    </script>
 </body>
 
 </html>

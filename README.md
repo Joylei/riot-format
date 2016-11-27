@@ -1,11 +1,13 @@
 # riot-format
+
 a helper library for riotjs to format displays
 
-# methods
+## methods
 
 All parameters are optional.
 
-## date(formatMask?: string = 'default', utc?: boolean = false)
+### date(formatMask?: string = 'default', utc?: boolean = false)
+
 convert input to date and format by specified mask
 
 Pre-defined format masks:
@@ -49,22 +51,26 @@ mask supported flags:
 - TT: AM | PM
 - Z: timezone
 
-## number(fractionSize?: Number = 2)
+### number(fractionSize?: Number = 2)
+
 convert input to a fixed number.
 if it's a infinite number, it will be displayed as '-∞' or '∞'
 
-## bytes(fractionSize?: Number = 2, defaultValue?:string = '--')
+### bytes(fractionSize?: Number = 2, defaultValue?:string = '--')
+
 format number in K( > 1024), M (> 1024 * 1024), G (> 1024 * 1024 * 1024).
 if not a number or number below 0, display the default value.
 
 eg: -1 as --, 5 as 5, 2345 as 2.29K
 
-## json()
+### json()
+
 convert input to JSON string
 
-# usage
+## usage
 
-## use format as global method, so that you can use it with riot or without riot.
+### use format as global method, so that you can use it with riot or without riot.
+
 ```js
 import { format } from 'riot-format';
 //make it global;
@@ -73,46 +79,69 @@ window.format = format;
 console.log(format(new Date()));
 ```
 
-in this way, riot tag should work
 ```
 <app>
 { format(new Date()) }
 </app>
 ```
+Note: this way the format method is available for all tags.
 
 ## use it as riot mixin
 
 ### mixin globally
-```
+
+```js
 import format from 'riot-format';
 import * as riot from 'riot';
 format(riot);//mixin it globally
 ```
 
-Note: you should mixin it before you import any riot tags
+Note: you should mixin it before you import any riot tags. The format method is availalbe for all tags.
 
-### you can also mixin it by your need
+### you can also mixin it as you need
+
 ```js
-//your tag
+//app.js
 import { format } from 'riot-format';
+riot.mixin('riot-format', {
+  format
+})
+```
+
+```html
 <app>
   <span>{ format(new Date()) }</span>
-  riot.mixin({ format });
+  this.mixin('riot-format');
+</app>
+```
+Note: in this case the format method is available in the tag you defined.
+
+### no mixin, use it directly
+
+```html
+import {format} from 'riot-format';
+<app>
+  <span>{ format(new Date()) }</span>
 </app>
 ```
 
+Note: this way format is supposed to be available in the tag you defined.
 
 Besides these  methods, you can define more formatters as you need.
 
 ## extend
+
 define your own format method
+
 ```js
-import { define } from 'riot-format';
-define('yesno', function(value) {
+import { extend } from 'riot-format';
+extend('yesno', function(value) {
   return !!value ? 'yes' : 'no';
 });
 ```
+
 let's use this method
+
 ```html
 <app>
   <p>should display yes: {format(1, 'yesno')}</p>
@@ -120,13 +149,16 @@ let's use this method
   <p>or use like this: {format(1).yesno()}</p>
 </app>
 ```
+
 Note: it should be easy to understand how it works if you are familiar with pipes.
 
 ## pipes
+
 define another method
+
 ```js
-import { define } from 'riot-format';
-define('isToday', function(value) {
+import { extend } from 'riot-format';
+extend('isToday', function(value) {
   if (value) {
     var date = (value instanceof Date) ? value : new Date(value);
     if (!isNaN(date)) {
@@ -139,15 +171,19 @@ define('isToday', function(value) {
   return false;
 });
 ```
+
 use it
+
 ```html
 <app>
   <p>should display true: {format(new Date().toString()).date().isToday()}</p>
 </app>
 ```
 
-# example
+## example
+
 run example by
-```
+
+```sh
 npm start
 ```

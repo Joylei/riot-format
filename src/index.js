@@ -1,28 +1,32 @@
-import Formatter, {
-  extend
-} from './formatter';
-import format from './format';
+import { format, extend } from './format'
 
-//import built-in formatters
-import './formats';
+// import built-in formatters
+import './formatters'
 
-export default function hook(riot) {
+/**
+ * mixin format globally
+ * @param {any} riot riot module object
+ * @example
+ * import * as riot from 'riot';
+ * use(riot);
+ */
+export default function use(riot) {
+  riot.mixin({format})
+}
 
-  // if (!riot.Tag.prototype.format) {
-  //   riot.Tag.prototype.format = format;
-  // }
+/**
+ * same as extend()
+ * @see extend
+ * @deprecated
+ */
+use.define = function (...args) {
+  console.warn('define() is deprecated, use extend() instead.')
+  return extend(args)
+}
 
-  riot.mixin({
-    format
-  });
-};
+use.extend = extend
 
-hook.define = extend;
+use.format = format
 
-hook.format = format;
-
-//hook.Formatter = Formatter;
-
-export { extend as define } from './formatter';
-
-export { default as format } from './format';
+// use.Formatter = Formatter
+export { format, extend } from './format'

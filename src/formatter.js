@@ -1,26 +1,32 @@
+/**
+ * a decorator class to format value
+ * @class
+ */
 export default class Formatter {
-  constructor(value) {
-    this.value = value;
+  constructor (value) {
+    this.value = value
   }
 
-  toString() {
-    //apply auto format
+  /**
+   * @description format the value to String
+   * @returns {String}
+   */
+  toString () {
+    // apply auto format
     if (this.value instanceof Date && !isNaN(this.value.valueOf())) {
-      return this.date('default').toString();
+      const date = this.date;
+      if(typeof date === 'function'){
+        return date.call(this, 'default').toString();
+      }
     }
-    return String(this.value);
+    return String(this.value)
   }
 
-  valueOf() {
-    return this.value;
+  /**
+   * get current value
+   */
+  valueOf () {
+    return this.value
   }
-};
+}
 
-export function extend(name, fn) {
-  if (typeof name == 'string' && typeof fn == 'function') {
-    Formatter.prototype[name] = function (...args) {
-      this.value = fn.apply(null, [this.valueOf()].concat(args));
-      return this;
-    };
-  }
-};

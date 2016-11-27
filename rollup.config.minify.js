@@ -7,7 +7,7 @@ export default {
     format: 'umd',
     moduleName: 'riotFormat',
     moduleId: 'riot-format',
-    dest: 'dist/riot-format.js',
+    dest: 'dist/riot-format.min.js',
     exports: 'named',
     sourceMap: true,
     plugins:[
@@ -17,6 +17,7 @@ export default {
         }),
         buble({
             modules: true
-        })
+        }),
+        uglify()
     ]
 };
