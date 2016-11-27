@@ -89,6 +89,8 @@ import * as riot from 'riot';
 format(riot);//mixin it globally
 ```
 
+Note: you should mixin it before you import any riot tags
+
 ### you can also mixin it by your need
 ```js
 //your tag
