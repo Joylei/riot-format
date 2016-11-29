@@ -1,10 +1,13 @@
 import Formatter from './formatter'
+import opts from './opts'
+
+const slice = Array.prototype.slice
 
 /**
  * Forbidden names when define formatters or retrieve formatter
  * @constant
  */
-const ForbiddenMethods = ['value', 'toString', 'valueOf']
+const ForbiddenMethods = ['value', 'toString', 'valueOf', '_value', '_error', '_chains']
 
 /**
 * format a given value in the riot tag context
@@ -21,9 +24,15 @@ const ForbiddenMethods = ['value', 'toString', 'valueOf']
 * @param {string} method  the format method to be used
 * @returns {Formatter} the Formatter instance
 */
-export function format (value, method, ...args) {
+export function format (value, method) {
     const self = new Formatter(value)
-    if (typeof method == 'string' && ForbiddenMethods.indexOf(method)==-1) {
+    const args = slice.call(arguments, 2)
+    if (typeof method == 'string') {
+        if(ForbiddenMethods.indexOf(method)!==-1){
+            console.warn('ignored, not allowed method name: ' + method)
+            return
+        }
+
         const fn = self[method]
         if (typeof fn === 'function') {
             fn.apply(self, args)
@@ -34,17 +43,36 @@ export function format (value, method, ...args) {
     return self
 }
 
+format.opts = opts
+
 /**
  * @param {String} method method name
  * @param {Function} fn method body
  */
 function defineFormatter (method, fn) {
-    if (typeof method == 'string' && ForbiddenMethods.indexOf(method)==-1 && typeof fn == 'function') {
-        Formatter.prototype[method] = function (...args) {
-            this.value = fn.apply(null, [this.valueOf()].concat(args))
+    if (typeof method == 'string' && typeof fn == 'function') {
+        if(ForbiddenMethods.indexOf(method)!==-1){
+            throw new Error('not allowed method name: ' + method)
+        }
+
+        const format = function () {
+            const args = slice.call(arguments, 0)
+            let chains = this._chains
+            if(!chains){
+                chains = []
+            }
+            chains.push(function(value){
+                args.unshift(value)
+                return fn.apply(null, args)
+            })
+            this._chains = chains
             return this
         }
+        format._def = fn
+        Formatter.prototype[method] = format
+        return
     }
+    throw new Error('check your parameters')
 }
 
 /**

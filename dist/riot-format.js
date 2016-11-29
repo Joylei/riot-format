@@ -4,42 +4,119 @@
   (factory((global.riotFormat = global.riotFormat || {})));
 }(this, (function (exports) { 'use strict';
 
+var DEFAULT_ERROR = '!ERR!';
+
+var opts = {
+    /**
+     * represents that error occurs when evaluted formatters
+     */ 
+    err: DEFAULT_ERROR
+};
+
+function getOption(key){
+    var val = opts[key];
+    if(key == 'err' && (typeof val === 'undefined' || val == null)){
+        return DEFAULT_ERROR
+    }
+    return val
+}
+
 /**
  * a decorator class to format value
  * @class
  */
 var Formatter = function Formatter (value) {
-      this.value = value;
+      this._value = value;
+      //this._lazyValue = null
+      //this[CHAINS_CALL] = null
   };
+
+var prototypeAccessors = { value: {},current: {} };
 
 /**
  * @description format the value to String
  * @returns {String}
  */
   Formatter.prototype.toString = function toString () {
-  // apply auto format
-      if (this.value instanceof Date && !isNaN(this.value.valueOf())) {
-          //test date format method
-          var date = this.date;
-          if(typeof date === 'function'){
-              return date.call(this, 'default').toString()
-          }
+      var val = this.current;
+      if(val === null || typeof val === 'undefined'){
+          return ''
       }
-      return String(this.value)
+      return String(this.current)
   };
 
-/**
- * get current value
+  /**
+   * the original value passed in
+   * 
+   * @readonly
+   * 
+   * @memberOf Formatter
+   */
+  prototypeAccessors.value.get = function (){
+      return this._value
+  };
+
+  /**
+   * the evaluated value by chained formatters
+   * 
+   * @readonly
+   * 
+   * @memberOf Formatter
+   */
+  prototypeAccessors.current.get = function (){
+      //check error
+      if(this._error){
+          console.error(this._error);
+          return getOption('err')
+      }
+
+      if('_lazyValue' in this){
+          return this._lazyValue
+      }
+
+      var chains = this._chains;
+      //no chains
+      if(!chains){
+          return this._value
+      }
+
+      delete this._chains;
+      delete this._lazyValue;
+      delete this._error;
+
+      //eval chains
+      try {
+          var val = this._value;
+          for(var i=0; i< chains.length; i++){
+              val = chains[i](val);
+          }
+          this._lazyValue = val;
+          return val
+      } catch (e) {
+          this._error = e;
+          console.error(e);
+      }
+      return getOption('err')
+  };
+
+ /**
+ * deprecated, use current
+ * @deprecated
  */
   Formatter.prototype.valueOf = function valueOf () {
-      return this.value
+      console.warn('deprecated, will be removed in future');
+      return this.current
   };
+
+Object.defineProperties( Formatter.prototype, prototypeAccessors );
+
+var slice = Array.prototype.slice;
 
 /**
  * Forbidden names when define formatters or retrieve formatter
  * @constant
  */
-var ForbiddenMethods = ['value', 'toString', 'valueOf'];
+var ForbiddenMethods = ['value', 'toString', 'valueOf', '_value', '_error', '_chains'];
 
 /**
 * format a given value in the riot tag context
@@ -57,11 +134,14 @@ var ForbiddenMethods = ['value', 'toString', 'valueOf'];
 * @returns {Formatter} the Formatter instance
 */
 function format (value, method) {
-    var args = [], len = arguments.length - 2;
-    while ( len-- > 0 ) args[ len ] = arguments[ len + 2 ];
-
     var self = new Formatter(value);
-    if (typeof method == 'string' && ForbiddenMethods.indexOf(method)==-1) {
+    var args = slice.call(arguments, 2);
+    if (typeof method == 'string') {
+        if(ForbiddenMethods.indexOf(method)!==-1){
+            console.warn('ignored, not allowed method name: ' + method);
+            return
+        }
+
         var fn = self[method];
         if (typeof fn === 'function') {
             fn.apply(self, args);
@@ -72,20 +152,36 @@ function format (value, method) {
     return self
 }
 
+format.opts = opts;
+
 /**
  * @param {String} method method name
  * @param {Function} fn method body
  */
 function defineFormatter (method, fn) {
-    if (typeof method == 'string' && ForbiddenMethods.indexOf(method)==-1 && typeof fn == 'function') {
-        Formatter.prototype[method] = function () {
-            var args = [], len = arguments.length;
-            while ( len-- ) args[ len ] = arguments[ len ];
+    if (typeof method == 'string' && typeof fn == 'function') {
+        if(ForbiddenMethods.indexOf(method)!==-1){
+            throw new Error('not allowed method name: ' + method)
+        }
 
-            this.value = fn.apply(null, [this.valueOf()].concat(args));
+        var format = function () {
+            var args = slice.call(arguments, 0);
+            var chains = this._chains;
+            if(!chains){
+                chains = [];
+            }
+            chains.push(function(value){
+                args.unshift(value);
+                return fn.apply(null, args)
+            });
+            this._chains = chains;
             return this
         };
+        format._def = fn;
+        Formatter.prototype[method] = format;
+        return
     }
+    throw new Error('check your parameters')
 }
 
 /**
