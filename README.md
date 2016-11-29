@@ -84,7 +84,7 @@ import { format } from 'riot-format';
 //make it global;
 window.format = format;
 
-console.log(format(new Date(), 'date').valueOf());
+console.log(format(new Date(), 'date').current);
 ```
 
 ```html
