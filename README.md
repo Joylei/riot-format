@@ -201,3 +201,10 @@ npm start
 ## License
 
 MIT
+
+[license-image]:http://img.shields.io/badge/license-MIT-000000.svg?style=flat-square
+[license-url]:LICENSE
+
+[npm-version-image]:http://img.shields.io/npm/v/riot-format.svg?style=flat-square
+[npm-downloads-image]:http://img.shields.io/npm/dm/riot-format.svg?style=flat-square
+[npm-url]:https://npmjs.org/package/riot-format
