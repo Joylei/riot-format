@@ -1,4 +1,5 @@
 import { format, extend } from './format'
+import { arrayify } from './util'
 
 // import built-in formatters
 import './formatters'
@@ -11,7 +12,7 @@ import './formatters'
  * use(riot);
  */
 export function use(riot) {
-    riot.mixin({format})
+    riot.mixin({ format })
 }
 
 /**
@@ -19,9 +20,9 @@ export function use(riot) {
  * @see extend
  * @deprecated
  */
-use.define = function (...args) {
+use.define = function () {
     console.warn('define() is deprecated, use extend() instead.')
-    return extend(...args)
+    return extend.apply(null, arrayify(arguments))
 }
 
 use.extend = extend

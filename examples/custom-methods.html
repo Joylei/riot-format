@@ -27,10 +27,10 @@
   </p>
   <script>
       //following lines equals:  import format, { extend } from 'riot-format';
-      var format = riotFormat['default'];
+      var f = riotFormat['default'];
       var extend = riotFormat.extend;
 
-      format(riot);//mixin
+      f(riot);//mixin
 
       //extend formatter
       extend('isToday', function (value) {

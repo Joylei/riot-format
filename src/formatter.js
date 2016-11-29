@@ -1,4 +1,15 @@
-import { getOption } from './opts'
+import opts from './opts'
+import { isNullOrUndefined, error } from './util'
+
+function handleError(e){
+    if(opts.errorBehavior === 2){
+        return
+    }else if(opts.errorBehavior === 1){
+        throw e
+    }else{
+        error(e)
+    }
+}
 
 /**
  * a decorator class to format value
@@ -7,8 +18,6 @@ import { getOption } from './opts'
 export default class Formatter {
     constructor (value) {
         this._value = value
-        //this._lazyValue = null
-        //this[CHAINS_CALL] = null
     }
 
   /**
@@ -17,10 +26,7 @@ export default class Formatter {
    */
     toString () {
         let val = this.current
-        if(val === null || typeof val === 'undefined'){
-            return ''
-        }
-        return String(this.current)
+        return isNullOrUndefined(val) ? '' : String(val)
     }
 
     /**
@@ -44,8 +50,8 @@ export default class Formatter {
     get current(){
         //check error
         if(this._error){
-            console.error(this._error)
-            return getOption('err')
+            handleError(this._error)
+            return opts.errorText
         }
 
         if('_lazyValue' in this){
@@ -72,18 +78,9 @@ export default class Formatter {
             return val
         } catch (e) {
             this._error = e
-            console.error(e)
+            handleError(e)
         }
-        return getOption('err')
-    }
-
-   /**
-   * deprecated, use current
-   * @deprecated
-   */
-    valueOf () {
-        console.warn('deprecated, will be removed in future')
-        return this.current
+        return opts.errorText
     }
 }
 

@@ -1,21 +1,16 @@
-export default function bytes (input, fractionSize = 2 , defaultValue = '--') {
-    const num = Number(input)
+const units = 'KMG'
 
-    if (isNaN(num.valueOf()) || num < 0) {
+export default function bytes (input, fractionSize = 2, defaultValue = '--') {
+    let num = Number(input)
+
+    if (isNaN(num.valueOf()) || !isFinite(num.valueOf()) || num < 0) {
         return defaultValue
     }
-    if (fractionSize < 0) {
-        fractionSize = 2
+    
+    let i=0
+    for(; num>1024 && i<=3 ; i++) {
+        num = num /1024
     }
 
-    if (num < 1024) {
-        return num.toFixed(0) + ''
-    }
-    if (num < 1024 * 1024) {
-        return (num / 1024).toFixed(fractionSize) + 'K'
-    }
-    if (num < 1024 * 1024 * 1024) {
-        return (num / (1024 * 1024)).toFixed(fractionSize) + 'M'
-    }
-    return (num / (1024 * 1024 * 1024)).toFixed(fractionSize) + 'G'
+    return i > 0 ? (num.toFixed(fractionSize) + units[i - 1]) : (num + '')
 }

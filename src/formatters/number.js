@@ -1,7 +1,4 @@
-export default function number (input, fractionSize) {
-    if (fractionSize === void 0 || fractionSize < 0) {
-        fractionSize = 2
-    }
+export default function number (input, fractionSize = 2) {
     const num = Number(input)
     if (isNaN(num.valueOf())) {
         return input

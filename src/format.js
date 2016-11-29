@@ -1,13 +1,12 @@
 import Formatter from './formatter'
 import opts from './opts'
-
-const slice = Array.prototype.slice
+import { slice, isString, isFunction, inArray, fail, warn } from './util'
 
 /**
  * Forbidden names when define formatters or retrieve formatter
  * @constant
  */
-const ForbiddenMethods = ['value', 'toString', 'valueOf', '_value', '_error', '_chains']
+const Forbiddens = ['value', 'current' ,'toString', '_value', '_error', '_chains']
 
 /**
 * format a given value in the riot tag context
@@ -27,17 +26,17 @@ const ForbiddenMethods = ['value', 'toString', 'valueOf', '_value', '_error', '_
 export function format (value, method) {
     const self = new Formatter(value)
     const args = slice.call(arguments, 2)
-    if (typeof method == 'string') {
-        if(ForbiddenMethods.indexOf(method)!==-1){
-            console.warn('ignored, not allowed method name: ' + method)
-            return
+    if (isString(method)) {
+        if(inArray(Forbiddens, method)){
+            warn('ignored, not allowed method: ' + method)
+            return self
         }
 
         const fn = self[method]
-        if (typeof fn === 'function') {
+        if (isFunction(fn)) {
             fn.apply(self, args)
-        }else if(!fn){
-            throw new Error('method not found: ' + method)
+        }else{
+            fail('method not found: ' + method)
         }
     }
     return self
@@ -50,9 +49,9 @@ format.opts = opts
  * @param {Function} fn method body
  */
 function defineFormatter (method, fn) {
-    if (typeof method == 'string' && typeof fn == 'function') {
-        if(ForbiddenMethods.indexOf(method)!==-1){
-            throw new Error('not allowed method name: ' + method)
+    if (isString(method) && isFunction(fn)) {
+        if(inArray(Forbiddens, method)){
+            fail('not allowed method: ' + method)
         }
 
         const format = function () {
@@ -72,7 +71,7 @@ function defineFormatter (method, fn) {
         Formatter.prototype[method] = format
         return
     }
-    throw new Error('check your parameters')
+    fail('check parameters')
 }
 
 /**

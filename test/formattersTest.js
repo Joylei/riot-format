@@ -14,7 +14,7 @@ describe('formatters', () => {
                 expect(date).to.be.a('function')
             })
 
-            it('should format with defualt mask', () => {
+            it('should format with default mask', () => {
                 const time = new Date('2015-10-1 15:30:12')
                 expect(date(time)).to.equal('Thu Oct 01 2015 15:30:12')
             })
@@ -69,24 +69,29 @@ describe('formatters', () => {
                 expect(bytes).to.be.a('function')
             })
 
+            it('should format for negative number', () => {
+                const num = -100
+                expect(bytes(num)).to.equal('--')
+            })
+
             it('should format for input below 1024', () => {
                 const num = 100
                 expect(bytes(num)).to.equal('100')
             })
 
             it('should format for input below 1024*1024', () => {
-                const num = 1024 * 100
-                expect(bytes(num)).to.equal('100.00K')
+                const num = 1024 * 100.123
+                expect(bytes(num)).to.equal('100.12K')
             })
 
             it('should format for input below 1024*1024*1024', () => {
-                const num = 1024 * 1024 * 100
-                expect(bytes(num)).to.equal('100.00M')
+                const num = 1024 * 1024 * 100.211
+                expect(bytes(num)).to.equal('100.21M')
             })
 
             it('should format for input above 1024*1024*1024', () => {
-                const num = 1024 * 1024 * 1024 * 100
-                expect(bytes(num)).to.equal('100.00G')
+                const num = 1024 * 1024 * 1024 * 100.215
+                expect(bytes(num)).to.equal('100.22G')
             })
         })
     })

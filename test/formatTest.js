@@ -38,7 +38,7 @@ describe('format.js',function(){
             })
         })
 
-        describe('when extend multiple: yes and no', function(){
+        describe('when extend yes and no', function(){
             extend({
                 yes(input){
                     return input ? 'yes' : ''

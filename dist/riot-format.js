@@ -4,21 +4,72 @@
   (factory((global.riotFormat = global.riotFormat || {})));
 }(this, (function (exports) { 'use strict';
 
-var DEFAULT_ERROR = '!ERR!';
-
 var opts = {
+    /**
+     * 0 - log error in console
+     * 1 - throw error
+     * 2 - sliently swallow
+     */
+    errorBehavior: 0,
     /**
      * represents that error occurs when evaluted formatters
      */ 
-    err: DEFAULT_ERROR
+    errorText: '!ERR!'
 };
 
-function getOption(key){
-    var val = opts[key];
-    if(key == 'err' && (typeof val === 'undefined' || val == null)){
-        return DEFAULT_ERROR
+var slice = Array.prototype.slice;
+
+function arrayify(obj){
+    return slice.call(obj, 0)
+}
+
+function isString(obj){
+    return typeof obj === 'string'
+}
+
+function isFunction(obj){
+    return typeof obj === 'function'
+}
+
+function isUndefined(obj){
+    return typeof obj === 'undefined'
+}
+
+function isNull(obj){
+    return obj === null
+}
+
+function isNullOrUndefined(obj){
+    return isUndefined(obj) || isNull(obj)
+}
+
+function inArray(arr, item){
+    return arr.indexOf(item) !== -1
+}
+
+/**
+ * throw error
+ * 
+ * @export
+ * @param {string} msg
+ * @returns {never}
+ */
+function fail(msg){
+    throw new Error(msg)
+}
+
+var warn = console.warn.bind(console);
+
+var error = console.error.bind(console);
+
+function handleError(e){
+    if(opts.errorBehavior === 2){
+        return
+    }else if(opts.errorBehavior === 1){
+        throw e
+    }else{
+        error(e);
     }
-    return val
 }
 
 /**
@@ -27,8 +78,6 @@ function getOption(key){
  */
 var Formatter = function Formatter (value) {
       this._value = value;
-      //this._lazyValue = null
-      //this[CHAINS_CALL] = null
   };
 
 var prototypeAccessors = { value: {},current: {} };
@@ -39,10 +88,7 @@ var prototypeAccessors = { value: {},current: {} };
  */
   Formatter.prototype.toString = function toString () {
       var val = this.current;
-      if(val === null || typeof val === 'undefined'){
-          return ''
-      }
-      return String(this.current)
+      return isNullOrUndefined(val) ? '' : String(val)
   };
 
   /**
@@ -66,8 +112,8 @@ var prototypeAccessors = { value: {},current: {} };
   prototypeAccessors.current.get = function (){
       //check error
       if(this._error){
-          console.error(this._error);
-          return getOption('err')
+          handleError(this._error);
+          return opts.errorText
       }
 
       if('_lazyValue' in this){
@@ -94,29 +140,18 @@ var prototypeAccessors = { value: {},current: {} };
           return val
       } catch (e) {
           this._error = e;
-          console.error(e);
+          handleError(e);
       }
-      return getOption('err')
-  };
-
- /**
- * deprecated, use current
- * @deprecated
- */
-  Formatter.prototype.valueOf = function valueOf () {
-      console.warn('deprecated, will be removed in future');
-      return this.current
+      return opts.errorText
   };
 
 Object.defineProperties( Formatter.prototype, prototypeAccessors );
-
-var slice = Array.prototype.slice;
 
 /**
  * Forbidden names when define formatters or retrieve formatter
  * @constant
  */
-var ForbiddenMethods = ['value', 'toString', 'valueOf', '_value', '_error', '_chains'];
+var Forbiddens = ['value', 'current' ,'toString', '_value', '_error', '_chains'];
 
 /**
 * format a given value in the riot tag context
@@ -136,17 +171,17 @@ var ForbiddenMethods = ['value', 'toString', 'valueOf', '_value', '_error', '_ch
 function format (value, method) {
     var self = new Formatter(value);
     var args = slice.call(arguments, 2);
-    if (typeof method == 'string') {
-        if(ForbiddenMethods.indexOf(method)!==-1){
-            console.warn('ignored, not allowed method name: ' + method);
-            return
+    if (isString(method)) {
+        if(inArray(Forbiddens, method)){
+            warn('ignored, not allowed method: ' + method);
+            return self
         }
 
         var fn = self[method];
-        if (typeof fn === 'function') {
+        if (isFunction(fn)) {
             fn.apply(self, args);
-        }else if(!fn){
-            throw new Error('method not found: ' + method)
+        }else{
+            fail('method not found: ' + method);
         }
     }
     return self
@@ -159,9 +194,9 @@ format.opts = opts;
  * @param {Function} fn method body
  */
 function defineFormatter (method, fn) {
-    if (typeof method == 'string' && typeof fn == 'function') {
-        if(ForbiddenMethods.indexOf(method)!==-1){
-            throw new Error('not allowed method name: ' + method)
+    if (isString(method) && isFunction(fn)) {
+        if(inArray(Forbiddens, method)){
+            fail('not allowed method: ' + method);
         }
 
         var format = function () {
@@ -181,7 +216,7 @@ function defineFormatter (method, fn) {
         Formatter.prototype[method] = format;
         return
     }
-    throw new Error('check your parameters')
+    fail('check parameters');
 }
 
 /**
@@ -349,9 +384,8 @@ dateFormat.polyfill = function () {
 };
 
 function number (input, fractionSize) {
-    if (fractionSize === void 0 || fractionSize < 0) {
-        fractionSize = 2;
-    }
+    if ( fractionSize === void 0 ) fractionSize = 2;
+
     var num = Number(input);
     if (isNaN(num.valueOf())) {
         return input
@@ -362,36 +396,31 @@ function number (input, fractionSize) {
     return num.toFixed(fractionSize).replace(/(\d)(?=(\d{3})+\.)/g, '$1,')
 }
 
-function bytes (input, fractionSize , defaultValue) {
+var units = 'KMG';
+
+function bytes (input, fractionSize, defaultValue) {
     if ( fractionSize === void 0 ) fractionSize = 2;
     if ( defaultValue === void 0 ) defaultValue = '--';
 
     var num = Number(input);
 
-    if (isNaN(num.valueOf()) || num < 0) {
+    if (isNaN(num.valueOf()) || !isFinite(num.valueOf()) || num < 0) {
         return defaultValue
     }
-    if (fractionSize < 0) {
-        fractionSize = 2;
+    
+    var i=0;
+    for(; num>1024 && i<=3 ; i++) {
+        num = num /1024;
     }
 
-    if (num < 1024) {
-        return num.toFixed(0) + ''
-    }
-    if (num < 1024 * 1024) {
-        return (num / 1024).toFixed(fractionSize) + 'K'
-    }
-    if (num < 1024 * 1024 * 1024) {
-        return (num / (1024 * 1024)).toFixed(fractionSize) + 'M'
-    }
-    return (num / (1024 * 1024 * 1024)).toFixed(fractionSize) + 'G'
+    return i > 0 ? (num.toFixed(fractionSize) + units[i - 1]) : (num + '')
 }
 
 function json (input) {
     return JSON.stringify(input)
 }
 
-extend({date: dateFormat, number: number,bytes: bytes,json: json});
+extend({date: dateFormat, number: number, bytes: bytes, json: json});
 
 // import built-in formatters
 /**
@@ -402,7 +431,7 @@ extend({date: dateFormat, number: number,bytes: bytes,json: json});
  * use(riot);
  */
 function use(riot) {
-    riot.mixin({format: format});
+    riot.mixin({ format: format });
 }
 
 /**
@@ -411,11 +440,8 @@ function use(riot) {
  * @deprecated
  */
 use.define = function () {
-    var args = [], len = arguments.length;
-    while ( len-- ) args[ len ] = arguments[ len ];
-
     console.warn('define() is deprecated, use extend() instead.');
-    return extend.apply(void 0, args)
+    return extend.apply(null, arrayify(arguments))
 };
 
 use.extend = extend;

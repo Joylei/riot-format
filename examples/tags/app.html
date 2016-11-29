@@ -4,8 +4,26 @@
   <p>should display no: {format(null, 'yesno')}</p>
   <p>should display true: {format(new Date().toString()).date().isToday()}</p>
 
+  <br/>
+  <p>in each</p>
+  <p>
+      <ul>
+            <li each="{ item,i in items }">
+              { item } as { format(item).number(i) }
+            </li>
+      </ul>
+  </p>
+
   <script>
   var self = this;
+
+  var items = []
+  for(var i=0; i<5; i++){
+      items.push(Math.random() * 10)
+  }
+  self.items = items
+  console.log(items)
+
   this.now = new Date();
   var id = setInterval(function(){
     self.now = new Date();
@@ -14,5 +32,6 @@
   self.on('unmount', function(){
     clearInterval(id);
   });
+  
   </script>
 </app>

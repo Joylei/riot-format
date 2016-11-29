@@ -4,42 +4,154 @@
   (factory((global.riotFormat = global.riotFormat || {})));
 }(this, (function (exports) { 'use strict';
 
+var opts = {
+    /**
+     * 0 - log error in console
+     * 1 - throw error
+     * 2 - sliently swallow
+     */
+    errorBehavior: 0,
+    /**
+     * represents that error occurs when evaluted formatters
+     */ 
+    errorText: '!ERR!'
+};
+
+var slice = Array.prototype.slice;
+
+function arrayify(obj){
+    return slice.call(obj, 0)
+}
+
+function isString(obj){
+    return typeof obj === 'string'
+}
+
+function isFunction(obj){
+    return typeof obj === 'function'
+}
+
+function isUndefined(obj){
+    return typeof obj === 'undefined'
+}
+
+function isNull(obj){
+    return obj === null
+}
+
+function isNullOrUndefined(obj){
+    return isUndefined(obj) || isNull(obj)
+}
+
+function inArray(arr, item){
+    return arr.indexOf(item) !== -1
+}
+
+/**
+ * throw error
+ * 
+ * @export
+ * @param {string} msg
+ * @returns {never}
+ */
+function fail(msg){
+    throw new Error(msg)
+}
+
+var warn = console.warn.bind(console);
+
+var error = console.error.bind(console);
+
+function handleError(e){
+    if(opts.errorBehavior === 2){
+        return
+    }else if(opts.errorBehavior === 1){
+        throw e
+    }else{
+        error(e);
+    }
+}
+
 /**
  * a decorator class to format value
  * @class
  */
 var Formatter = function Formatter (value) {
-      this.value = value;
+      this._value = value;
   };
+
+var prototypeAccessors = { value: {},current: {} };
 
 /**
  * @description format the value to String
  * @returns {String}
  */
   Formatter.prototype.toString = function toString () {
-  // apply auto format
-      if (this.value instanceof Date && !isNaN(this.value.valueOf())) {
-          //test date format method
-          var date = this.date;
-          if(typeof date === 'function'){
-              return date.call(this, 'default').toString()
-          }
-      }
-      return String(this.value)
+      var val = this.current;
+      return isNullOrUndefined(val) ? '' : String(val)
   };
 
-/**
- * get current value
- */
-  Formatter.prototype.valueOf = function valueOf () {
-      return this.value
+  /**
+   * the original value passed in
+   * 
+   * @readonly
+   * 
+   * @memberOf Formatter
+   */
+  prototypeAccessors.value.get = function (){
+      return this._value
   };
+
+  /**
+   * the evaluated value by chained formatters
+   * 
+   * @readonly
+   * 
+   * @memberOf Formatter
+   */
+  prototypeAccessors.current.get = function (){
+      //check error
+      if(this._error){
+          handleError(this._error);
+          return opts.errorText
+      }
+
+      if('_lazyValue' in this){
+          return this._lazyValue
+      }
+
+      var chains = this._chains;
+      //no chains
+      if(!chains){
+          return this._value
+      }
+
+      delete this._chains;
+      delete this._lazyValue;
+      delete this._error;
+
+      //eval chains
+      try {
+          var val = this._value;
+          for(var i=0; i< chains.length; i++){
+              val = chains[i](val);
+          }
+          this._lazyValue = val;
+          return val
+      } catch (e) {
+          this._error = e;
+          handleError(e);
+      }
+      return opts.errorText
+  };
+
+Object.defineProperties( Formatter.prototype, prototypeAccessors );
 
 /**
  * Forbidden names when define formatters or retrieve formatter
  * @constant
  */
-var ForbiddenMethods = ['value', 'toString', 'valueOf'];
+var Forbiddens = ['value', 'current' ,'toString', '_value', '_error', '_chains'];
 
 /**
 * format a given value in the riot tag context
@@ -57,35 +169,54 @@ var ForbiddenMethods = ['value', 'toString', 'valueOf'];
 * @returns {Formatter} the Formatter instance
 */
 function format (value, method) {
-    var args = [], len = arguments.length - 2;
-    while ( len-- > 0 ) args[ len ] = arguments[ len + 2 ];
-
     var self = new Formatter(value);
-    if (typeof method == 'string' && ForbiddenMethods.indexOf(method)==-1) {
+    var args = slice.call(arguments, 2);
+    if (isString(method)) {
+        if(inArray(Forbiddens, method)){
+            warn('ignored, not allowed method: ' + method);
+            return self
+        }
+
         var fn = self[method];
-        if (typeof fn === 'function') {
+        if (isFunction(fn)) {
             fn.apply(self, args);
-        }else if(!fn){
-            throw new Error('method not found: ' + method)
+        }else{
+            fail('method not found: ' + method);
         }
     }
     return self
 }
+
+format.opts = opts;
 
 /**
  * @param {String} method method name
  * @param {Function} fn method body
  */
 function defineFormatter (method, fn) {
-    if (typeof method == 'string' && ForbiddenMethods.indexOf(method)==-1 && typeof fn == 'function') {
-        Formatter.prototype[method] = function () {
-            var args = [], len = arguments.length;
-            while ( len-- ) args[ len ] = arguments[ len ];
+    if (isString(method) && isFunction(fn)) {
+        if(inArray(Forbiddens, method)){
+            fail('not allowed method: ' + method);
+        }
 
-            this.value = fn.apply(null, [this.valueOf()].concat(args));
+        var format = function () {
+            var args = slice.call(arguments, 0);
+            var chains = this._chains;
+            if(!chains){
+                chains = [];
+            }
+            chains.push(function(value){
+                args.unshift(value);
+                return fn.apply(null, args)
+            });
+            this._chains = chains;
             return this
         };
+        format._def = fn;
+        Formatter.prototype[method] = format;
+        return
     }
+    fail('check parameters');
 }
 
 /**
@@ -253,9 +384,8 @@ dateFormat.polyfill = function () {
 };
 
 function number (input, fractionSize) {
-    if (fractionSize === void 0 || fractionSize < 0) {
-        fractionSize = 2;
-    }
+    if ( fractionSize === void 0 ) fractionSize = 2;
+
     var num = Number(input);
     if (isNaN(num.valueOf())) {
         return input
@@ -266,36 +396,31 @@ function number (input, fractionSize) {
     return num.toFixed(fractionSize).replace(/(\d)(?=(\d{3})+\.)/g, '$1,')
 }
 
-function bytes (input, fractionSize , defaultValue) {
+var units = 'KMG';
+
+function bytes (input, fractionSize, defaultValue) {
     if ( fractionSize === void 0 ) fractionSize = 2;
     if ( defaultValue === void 0 ) defaultValue = '--';
 
     var num = Number(input);
 
-    if (isNaN(num.valueOf()) || num < 0) {
+    if (isNaN(num.valueOf()) || !isFinite(num.valueOf()) || num < 0) {
         return defaultValue
     }
-    if (fractionSize < 0) {
-        fractionSize = 2;
+    
+    var i=0;
+    for(; num>1024 && i<=3 ; i++) {
+        num = num /1024;
     }
 
-    if (num < 1024) {
-        return num.toFixed(0) + ''
-    }
-    if (num < 1024 * 1024) {
-        return (num / 1024).toFixed(fractionSize) + 'K'
-    }
-    if (num < 1024 * 1024 * 1024) {
-        return (num / (1024 * 1024)).toFixed(fractionSize) + 'M'
-    }
-    return (num / (1024 * 1024 * 1024)).toFixed(fractionSize) + 'G'
+    return i > 0 ? (num.toFixed(fractionSize) + units[i - 1]) : (num + '')
 }
 
 function json (input) {
     return JSON.stringify(input)
 }
 
-extend({date: dateFormat, number: number,bytes: bytes,json: json});
+extend({date: dateFormat, number: number, bytes: bytes, json: json});
 
 // import built-in formatters
 /**
@@ -306,7 +431,7 @@ extend({date: dateFormat, number: number,bytes: bytes,json: json});
  * use(riot);
  */
 function use(riot) {
-    riot.mixin({format: format});
+    riot.mixin({ format: format });
 }
 
 /**
@@ -315,11 +440,8 @@ function use(riot) {
  * @deprecated
  */
 use.define = function () {
-    var args = [], len = arguments.length;
-    while ( len-- ) args[ len ] = arguments[ len ];
-
     console.warn('define() is deprecated, use extend() instead.');
-    return extend.apply(void 0, args)
+    return extend.apply(null, arrayify(arguments))
 };
 
 use.extend = extend;
