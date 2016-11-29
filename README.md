@@ -2,7 +2,9 @@
 
 a helper library for riotjs to format displays
 
-## methods
+For typings, see [npm-riot-format](https://github.com/Joylei/npm-riot-format.git)
+
+## Format methods
 
 All parameters are optional.
 
@@ -69,7 +71,7 @@ eg: -1 as --, 5 as 5, 2345 as 2.29K
 
 convert input to JSON string
 
-## usage
+## Usage
 
 ### use format as global method, so that you can use it with riot or without riot
 
@@ -78,7 +80,7 @@ import { format } from 'riot-format';
 //make it global;
 window.format = format;
 
-console.log(format(new Date()));
+console.log(format(new Date(), 'date').valueOf());
 ```
 
 ```html
@@ -89,9 +91,9 @@ console.log(format(new Date()));
 
 Note: this way the format method is available for all tags.
 
-## use it as riot mixin
+### use it as riot mixin
 
-### mixin globally
+#### mixin globally
 
 ```js
 import format from 'riot-format';
@@ -101,7 +103,7 @@ format(riot);//mixin it globally
 
 Note: you should mixin it before you import any riot tags. The format method is availalbe for all tags.
 
-### you can also mixin it as you need
+#### you can also mixin it as you need
 
 ```js
 //app.js
@@ -133,7 +135,7 @@ Note: this way format is supposed to be available in the tag you defined.
 
 Besides these  methods, you can define more formatters as you need.
 
-## extend
+## Extend formatters
 
 define your own format method
 
@@ -156,7 +158,7 @@ let's use this method
 
 Note: it should be easy to understand how it works if you are familiar with pipes.
 
-## pipes
+## Pipes
 
 define another method
 
@@ -184,10 +186,14 @@ use it
 </app>
 ```
 
-## example
+## Example
 
 run example by
 
 ```sh
 npm start
 ```
+
+## License
+
+MIT
