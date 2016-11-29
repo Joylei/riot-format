@@ -2,6 +2,10 @@
 
 a helper library for riotjs to format displays
 
+[![NPM version][npm-version-image]][npm-url]
+[![NPM downloads][npm-downloads-image]][npm-url]
+[![MIT License][license-image]][license-url]
+
 For typings, see [npm-riot-format](https://github.com/Joylei/npm-riot-format.git)
 
 ## Format methods
