@@ -3,7 +3,7 @@
 a helper library for [riotjs](https://github.com/riot/riot) to format displays,
 without external dependecies, inspired by [$filter of angular](https://code.angularjs.org/1.5.9/docs/api/ng/service/$filter).
 
-The original idea is to make it work riot, but it can also work without riot.
+The original idea is to make it work with riot, but it can also work without riot.
 
 [![NPM version][npm-version-image]][npm-url]
 [![NPM downloads][npm-downloads-image]][npm-url]
