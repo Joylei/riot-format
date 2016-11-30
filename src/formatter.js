@@ -54,14 +54,11 @@ export default class Formatter {
             return opts.errorText
         }
 
-        if('_lazyValue' in this){
-            return this._lazyValue
-        }
-
         const chains = this._chains
+        let val =  '_lazyValue' in this ? this._lazyValue : this._value
         //no chains
         if(!chains){
-            return this._value
+            return val
         }
 
         delete this._chains
@@ -70,7 +67,6 @@ export default class Formatter {
 
         //eval chains
         try {
-            let val = this._value
             for(let i=0; i< chains.length; i++){
                 val = chains[i](val)
             }

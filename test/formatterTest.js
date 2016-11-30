@@ -16,26 +16,38 @@ describe('Formatter',function(){
             expect(formatter.value).to.be.equal(1)
         })
 
-        it('#formatter.current should be not available before called current', function(){
+        it('#formatter.current should not be evaluated before called current', function(){
             expect(formatter._lazyValue).to.be.a('undefined')
         })
 
         const times = 5
-        for(let i=0; i< times; i++) {
-            formatter.test()
-        }
+        before(function(){
+            let self = formatter
+            for(let i=0; i< times; i++) {
+                self = self.test()
+            }
+        })
+        it('#chained calls should work', function(){
+            expect(formatter.current).to.be.equal(formatter.value + times)
+        })
 
-        let result = formatter.value + times
-        it('#formatter.current should be ' + result, function(){
-            expect(formatter.current).to.be.equal(result)
+        it('#previous evaluated value should be persisted',function(){
+            let self = format(1)
+            self.test()
+            let first = self.current
+            self.test()
+            let second = self.current
+            expect(second).to.be.equal(first + 1)
         })
     })
 
-    extend('test', function(input){
-        throw new Error()
-    })
-
     describe('when error', function(){
+        before(function(){
+            extend('test', function(input){
+                throw new Error(input)
+            })
+        })
+
         describe('with defaults', function(){
             it('toString() should be !ERR!', function(){
                 let result = format(1, 'test').toString()
