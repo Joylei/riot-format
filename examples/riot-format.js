@@ -1,8 +1,11 @@
+/*riot-format: v1.1.0; https://github.com/Joylei/riot-format.git; License: MIT*/
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define('riot-format', ['exports'], factory) :
   (factory((global.riotFormat = global.riotFormat || {})));
 }(this, (function (exports) { 'use strict';
+
+var DEFAULT_ERROR = '!ERR!';
 
 var opts = {
     /**
@@ -14,13 +17,15 @@ var opts = {
     /**
      * represents that error occurs when evaluted formatters
      */ 
-    errorText: '!ERR!'
+    errorText: DEFAULT_ERROR
 };
 
 var slice = Array.prototype.slice;
 
-function arrayify(obj){
-    return slice.call(obj, 0)
+function arrayify(obj, start){
+    if ( start === void 0 ) start = 0;
+
+    return slice.call(obj, start)
 }
 
 function isString(obj){
@@ -116,14 +121,11 @@ var prototypeAccessors = { value: {},current: {} };
           return opts.errorText
       }
 
-      if('_lazyValue' in this){
-          return this._lazyValue
-      }
-
       var chains = this._chains;
+      var val ='_lazyValue' in this ? this._lazyValue : this._value;
       //no chains
       if(!chains){
-          return this._value
+          return val
       }
 
       delete this._chains;
@@ -132,7 +134,6 @@ var prototypeAccessors = { value: {},current: {} };
 
       //eval chains
       try {
-          var val = this._value;
           for(var i=0; i< chains.length; i++){
               val = chains[i](val);
           }
@@ -170,7 +171,7 @@ var Forbiddens = ['value', 'current' ,'toString', '_value', '_error', '_chains']
 */
 function format (value, method) {
     var self = new Formatter(value);
-    var args = slice.call(arguments, 2);
+    var args = arrayify(arguments, 2);
     if (isString(method)) {
         if(inArray(Forbiddens, method)){
             warn('ignored, not allowed method: ' + method);
@@ -200,7 +201,7 @@ function defineFormatter (method, fn) {
         }
 
         var format = function () {
-            var args = slice.call(arguments, 0);
+            var args = arrayify(arguments);
             var chains = this._chains;
             if(!chains){
                 chains = [];
@@ -409,7 +410,7 @@ function bytes (input, fractionSize, defaultValue) {
     }
     
     var i=0;
-    for(; num>1024 && i<=3 ; i++) {
+    for(; num>=1024 && i<=3 ; i++) {
         num = num /1024;
     }
 
@@ -421,6 +422,13 @@ function json (input) {
 }
 
 extend({date: dateFormat, number: number, bytes: bytes, json: json});
+
+var version = '1.1.0';
+
+/**
+ * repo: https://github.com/Joylei/riot-format.git
+ * @author joylei <leingliu@gmail.com>
+ */
 
 // import built-in formatters
 /**
@@ -440,7 +448,7 @@ function use(riot) {
  * @deprecated
  */
 use.define = function () {
-    console.warn('define() is deprecated, use extend() instead.');
+    warn('define() is deprecated, use extend() instead.');
     return extend.apply(null, arrayify(arguments))
 };
 
@@ -450,6 +458,7 @@ use.format = format;
 
 exports.use = use;
 exports['default'] = use;
+exports.version = version;
 exports.format = format;
 exports.extend = extend;
 
