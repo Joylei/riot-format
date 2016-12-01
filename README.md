@@ -71,6 +71,8 @@ For more information, see [Get Started](docs/getstarted.md)
 
 - [Examples](examples)
 
+- [Demo](https://jsfiddle.net/wgs22gkg/)
+
 ## Plans
 
 - add currency support

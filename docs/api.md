@@ -76,3 +76,5 @@ convert input to JSON string
 - [Typings](../src/index.d.ts)
 
 - [Examples](../examples)
+
+- [Demo](https://jsfiddle.net/wgs22gkg/)

@@ -76,3 +76,5 @@ Besides these  methods, you can define more formatters as you need.
 - [Typings](../src/index.d.ts)
 
 - [Examples](../examples)
+
+- [Demo](https://jsfiddle.net/wgs22gkg/)
