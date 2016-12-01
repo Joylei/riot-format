@@ -1,7 +1,7 @@
 # riot-format
 
 a helper library for [riotjs](https://github.com/riot/riot) to format displays,
-without external dependecies, inspired by [$filter of angular](https://code.angularjs.org/1.5.9/docs/api/ng/service/$filter).
+without external dependencies, inspired by [$filter of angular](https://code.angularjs.org/1.5.9/docs/api/ng/service/$filter).
 
 The original idea is to make it work with riot, but it can also work without riot.
 
@@ -14,7 +14,9 @@ The original idea is to make it work with riot, but it can also work without rio
 - no external dependencies
 - chained format method calls
 - easy to extend
-- can work with riot
+- support modern browsers (IE9+)
+- compatible with riot
+- less than 5kb
 
 ## Get Started
 
@@ -56,17 +58,17 @@ console.log(formatter.current)
 
 For more information, see [Get Started](docs/getstarted.md)
 
-## Advanced Usage
+## More
 
-see [Advanced](docs/advanced.md)
+- [Advanced Usage](docs/advanced.md)
 
-## API
+- [How to extend](docs/extend.md)
 
-see [API](docs/api.md).
+- [API](docs/api.md)
 
-## Example
+- [Typings](src/index.d.ts)
 
-see [examples](examples)
+- [Examples](examples)
 
 ## Plans
 
