@@ -1,23 +1,10 @@
 import uglify from 'rollup-plugin-uglify'
-import resolve from 'rollup-plugin-node-resolve'
-import buble from 'rollup-plugin-buble'
+import config from './rollup.config'
 
-export default {
-    entry: 'src/index.js',
-    format: 'umd',
-    moduleName: 'riotFormat',
-    moduleId: 'riot-format',
-    dest: 'dist/riot-format.min.js',
-    exports: 'named',
+const conf = Object.assign({}, config,{
     sourceMap: true,
-    plugins:[
-        resolve({
-            jsnext: true,
-            main: true
-        }),
-        buble({
-            modules: true
-        }),
-        uglify()
-    ]
-}
+    dest: 'dist/riot-format.min.js',
+    plugins: [].concat(config.plugins).concat(uglify())
+})
+
+export default conf
