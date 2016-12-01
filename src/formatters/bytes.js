@@ -8,7 +8,7 @@ export default function bytes (input, fractionSize = 2, defaultValue = '--') {
     }
     
     let i=0
-    for(; num>1024 && i<=3 ; i++) {
+    for(; num>=1024 && i<=3 ; i++) {
         num = num /1024
     }
 

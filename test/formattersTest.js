@@ -79,6 +79,11 @@ describe('formatters', () => {
                 expect(bytes(num)).to.equal('100')
             })
 
+            it('should format for input eq 1024', () => {
+                const num = 1024
+                expect(bytes(num)).to.equal('1.00K')
+            })
+
             it('should format for input below 1024*1024', () => {
                 const num = 1024 * 100.123
                 expect(bytes(num)).to.equal('100.12K')
