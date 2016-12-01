@@ -1,3 +1,5 @@
+export const DEFAULT_ERROR = '!ERR!'
+
 export default {
     /**
      * 0 - log error in console
@@ -8,5 +10,5 @@ export default {
     /**
      * represents that error occurs when evaluted formatters
      */ 
-    errorText: '!ERR!'
+    errorText: DEFAULT_ERROR
 }
