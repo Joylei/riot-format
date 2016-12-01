@@ -1,5 +1,10 @@
+/**
+ * repo: https://github.com/Joylei/riot-format.git
+ * @author joylei <leingliu@gmail.com>
+ */
+
 import { format, extend } from './format'
-import { arrayify } from './util'
+import { arrayify,warn } from './util'
 
 // import built-in formatters
 import './formatters'
@@ -21,7 +26,7 @@ export function use(riot) {
  * @deprecated
  */
 use.define = function () {
-    console.warn('define() is deprecated, use extend() instead.')
+    warn('define() is deprecated, use extend() instead.')
     return extend.apply(null, arrayify(arguments))
 }
 

@@ -1,6 +1,6 @@
 import Formatter from './formatter'
 import opts from './opts'
-import { slice, isString, isFunction, inArray, fail, warn } from './util'
+import { arrayify, isString, isFunction, inArray, fail, warn } from './util'
 
 /**
  * Forbidden names when define formatters or retrieve formatter
@@ -25,7 +25,7 @@ const Forbiddens = ['value', 'current' ,'toString', '_value', '_error', '_chains
 */
 export function format (value, method) {
     const self = new Formatter(value)
-    const args = slice.call(arguments, 2)
+    const args = arrayify(arguments, 2)
     if (isString(method)) {
         if(inArray(Forbiddens, method)){
             warn('ignored, not allowed method: ' + method)
@@ -55,7 +55,7 @@ function defineFormatter (method, fn) {
         }
 
         const format = function () {
-            const args = slice.call(arguments, 0)
+            const args = arrayify(arguments)
             let chains = this._chains
             if(!chains){
                 chains = []

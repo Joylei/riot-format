@@ -1,7 +1,7 @@
-export const slice = Array.prototype.slice
+const slice = Array.prototype.slice
 
-export function arrayify(obj){
-    return slice.call(obj, 0)
+export function arrayify(obj, start = 0){
+    return slice.call(obj, start)
 }
 
 export function isString(obj){
