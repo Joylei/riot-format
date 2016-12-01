@@ -12,6 +12,7 @@ The original idea is to make it work with riot, but it can also work without rio
 ## why riot-format
 
 - no external dependencies
+- built-in format: [date(), number(), bytes(), json()](docs/api.md)
 - chained format method calls
 - easy to extend
 - support modern browsers (IE9+)
