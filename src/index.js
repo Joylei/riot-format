@@ -34,6 +34,8 @@ use.extend = extend
 
 use.format = format
 
+export { default as version } from './version'
+
 // use.Formatter = Formatter
 export { format, extend } from './format'
 

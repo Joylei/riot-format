@@ -122,4 +122,6 @@ declare module 'riot-format'{
     export var format: typeof use.format;
 
     export var extend: typeof use.extend;
+
+    export var version: string;
 }

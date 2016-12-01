@@ -1,8 +1,14 @@
 //import uglify from 'rollup-plugin-uglify'
 import resolve from 'rollup-plugin-node-resolve'
 import buble from 'rollup-plugin-buble'
+import replace from 'rollup-plugin-replace'
+import version from './src/version'
 
-const version = require('./package.json').version
+const pkgVersion = require('./package.json').version
+
+if(version!==pkgVersion){
+    throw new Error('please check version strings')
+}
 
 export default {
     entry: 'src/index.js',
@@ -17,6 +23,9 @@ export default {
         resolve({
             jsnext: true,
             main: true
+        }),
+        replace({
+            VERSION: version
         }),
         buble({
             modules: true
