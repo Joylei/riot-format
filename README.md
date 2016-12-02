@@ -21,13 +21,23 @@ The original idea is to make it work with riot, but it can also work without rio
 
 ## Get Started
 
-install it from npm
+### Get it from CDN
+
+CDN files:
+
+```
+https://cdn.jsdelivr.net/riot-format/1.1.1/riot-format.js
+https://cdn.jsdelivr.net/riot-format/1.1.1/riot-format.min.js
+https://cdn.jsdelivr.net/riot-format/1.1.1/riot-format.min.js.map
+```
+
+### Install it from npm
 
 ```sh
 npm install -D riot-format
 ```
 
-### Use it with riot
+#### Use it with riot
 
 mixin
 
@@ -48,7 +58,7 @@ use it in riot tag
 <app>
 ```
 
-### Use it directly without riot
+#### Use it directly without riot
 
 ```js
 import { format } from 'riot-format'
